@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gift Suggester</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+    form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-width: 600px; margin-bottom: 20px; }
+    .gift-card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      background: #fff;
+      display: inline-block;
+      width: 160px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .gift-card img {
+      width: 100px;
+      height: 100px;
+      border-radius: 4px;
+    }
+    #results { display: flex; flex-wrap: wrap; gap: 10px; }
+    button { padding: 10px 20px; border: none; background: #007BFF; color: white; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+
+<h1>Find the Perfect Gift!</h1>
+
+<form id="giftForm">
+  <label>Age: <input type="number" id="age" required></label><br><br>
+
+  <p>Gender:</p>
+  <label><input type="radio" name="gender" value="male" required> Male</label>
+  <label><input type="radio" name="gender" value="female"> Female</label>
+  <label><input type="radio" name="gender" value="any"> Other</label><br><br>
+
+  <p>Select Interests:</p>
+  <label><input type="checkbox" name="interests" value="tech"> Tech</label>
+  <label><input type="checkbox" name="interests" value="music"> Music</label>
+  <label><input type="checkbox" name="interests" value="fitness"> Fitness</label>
+  <label><input type="checkbox" name="interests" value="cooking"> Cooking</label>
+  <label><input type="checkbox" name="interests" value="toys"> Toys</label>
+  <label><input type="checkbox" name="interests" value="crafts"> Crafts</label>
+  <label><input type="checkbox" name="interests" value="gaming"> Gaming</label>
+  <label><input type="checkbox" name="interests" value="reading"> Reading</label>
+  <label><input type="checkbox" name="interests" value="photography"> Photography</label>
+  <label><input type="checkbox" name="interests" value="travel"> Travel</label>
+  <label><input type="checkbox" name="interests" value="fashion"> Fashion</label>
+  <label><input type="checkbox" name="interests" value="gardening"> Gardening</label>
+  <label><input type="checkbox" name="interests" value="art"> Art</label>
+  <label><input type="checkbox" name="interests" value="movies"> Movies</label>
+  <label><input type="checkbox" name="interests" value="sports"> Sports</label>
+  <label><input type="checkbox" name="interests" value="outdoors"> Outdoors</label><br><br>
+
+  <button type="submit">Find Gifts</button>
+</form>
+
+<hr>
+
+<h2>Gift Suggestions:</h2>
+<div id="results"></div>
+
+<script>
+const giftData = [
+  { name: "Lego Set", ageRange: "0–12", gender: "any", interests: ["toys", "creativity"], image: "https://picsum.photos/100?1" },
+  { name: "Headphones", ageRange: "13–18", gender: "any", interests: ["music", "tech"], image: "https://picsum.photos/100?2" },
+  { name: "Fitness Tracker", ageRange: "19–30", gender: "any", interests: ["fitness", "tech"], image: "https://picsum.photos/100?3" },
+  { name: "Cookbook", ageRange: "31–50", gender: "any", interests: ["cooking", "food"], image: "https://picsum.photos/100?4" },
+  { name: "Knitting Kit", ageRange: "50+", gender: "female", interests: ["crafts", "relaxation"], image: "https://picsum.photos/100?5" },
+  { name: "Gaming Mouse", ageRange: "13–30", gender: "any", interests: ["gaming", "tech"], image: "https://picsum.photos/100?6" },
+  { name: "Travel Journal", ageRange: "19–50", gender: "any", interests: ["travel", "writing"], image: "https://picsum.photos/100?7" },
+  { name: "Fashion Watch", ageRange: "19–50", gender: "any", interests: ["fashion"], image: "https://picsum.photos/100?8" },
+  { name: "Gardening Kit", ageRange: "31–50", gender: "any", interests: ["gardening", "outdoors"], image: "https://picsum.photos/100?9" },
+  { name: "E-reader", ageRange: "19–50", gender: "any", interests: ["reading", "tech"], image: "https://picsum.photos/100?10" },
+  { name: "Digital Camera", ageRange: "19–50", gender: "any", interests: ["photography", "tech"], image: "https://picsum.photos/100?11" },
+  { name: "Art Supply Set", ageRange: "13–50", gender: "any", interests: ["art", "creativity"], image: "https://picsum.photos/100?12" },
+  { name: "Movie Gift Card", ageRange: "13–50", gender: "any", interests: ["movies"], image: "https://picsum.photos/100?13" },
+  { name: "Sports Jersey", ageRange: "13–50", gender: "any", interests: ["sports"], image: "https://picsum.photos/100?14" },
+  { name: "Camping Gear", ageRange: "19–50", gender: "any", interests: ["outdoors", "travel"], image: "https://picsum.photos/100?15" }
+];
+
+function ageInRange(age, rangeStr) {
+  if (rangeStr === "50+") return age >= 50;
+  const [min, max] = rangeStr.split("–").map(Number);
+  return age >= min && age <= max;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function getGiftMatches(age, gender, interests) {
+  return shuffle(giftData.filter(gift =>
+    ageInRange(age, gift.ageRange) &&
+    (gift.gender === gender || gift.gender === "any") &&
+    gift.interests.some(i => interests.includes(i))
+  )).slice(0, 5);
+}
+
+function displayGifts(giftList) {
+  const container = document.getElementById("results");
+  container.innerHTML = "";
+  if (giftList.length === 0) {
+    container.innerHTML = "<p>No matching gifts found.</p>";
+    return;
+  }
+  giftList.forEach(gift => {
+    const card = document.createElement("div");
+    card.className = "gift-card";
+    card.innerHTML = `
+      <img src="${gift.image}" alt="${gift.name}">
+      <h4>${gift.name}</h4>
+    `;
+    container.appendChild(card);
+  });
+}
+
+document.getElementById("giftForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const age = parseInt(document.getElementById("age").value);
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
+  const interests = Array.from(document.querySelectorAll('input[name="interests"]:checked')).map(el => el.value);
+  if (!age || !gender || interests.length === 0) {
+    alert("Please fill in all fields.");
+    return;
+  }
+  const matches = getGiftMatches(age, gender, interests);
+  displayGifts(matches);
+});
+</script>
+
+</body>
+</html>
